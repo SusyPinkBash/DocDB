@@ -130,7 +130,6 @@ void index_function(const char * argv[]) {
             pair<unordered_map<string, list<Node>>::iterator, bool> insertion;
             insertion = map.insert(pair<string, list<Node>>(word, list<Node>()));
             
-            //            auto insertion = map[word].insert(node);
             if (insertion.second == false && insertion.first->second.back().filename == node.filename) {
                 ++insertion.first->second.back().frequency;
             } else {
@@ -145,13 +144,14 @@ void index_function(const char * argv[]) {
     ofstream index("INDEX");
     
     for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
-        cout << (*it).first << endl;
+       
+        index << it->first;
+        for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
+            index << " " << i->filename << " " << i->frequency;
+        index << endl;
     }
     
     index.close();
-    
-    
-    
     
 }
 
