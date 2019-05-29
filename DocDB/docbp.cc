@@ -22,7 +22,7 @@ using namespace std;
 
 class Node {
     
-private:
+//private:
     
 public:
     string keyword;
@@ -36,6 +36,12 @@ public:
     {}
     
     ~Node() {};
+    
+private:
+    // ##### GETTERS FUNCTIONS #####
+    string getFilename(Node node){
+        return node.filename;
+    }
     
 };
 
@@ -125,6 +131,13 @@ void index_function(int argc, const char * argv[]) {
                 bool found = false;
                
                 for (int i=0; i<nodes.size(); ++i) {
+                    cout << i << endl;
+                    cout << &nodes << endl;
+                    cout << &nodes[0] << endl;
+                    cout << &nodes[0]->filename << endl;
+                    
+                    
+                    
                     
                     if (nodes[i]->filename == argv[a]) {
 //                        cout << "before: " << nodes[i]->frequency << endl;
@@ -144,7 +157,8 @@ void index_function(int argc, const char * argv[]) {
             }
             
         }
-//        cout << map.size() << endl;
+        
+        cout << map.size() << endl;
         file.close();
     }
     
@@ -153,8 +167,10 @@ void index_function(int argc, const char * argv[]) {
     //    INDEX << "Some random test" << endl;
     //    INDEX.close();
     
+    
 //        map.~map();
 //    cout << "delete map" << endl;
+    
     
 }
 
