@@ -92,24 +92,24 @@ int check_arg(const char * arg, const char * word) {
 // Creates a reverse index of the words in the given files and saves it in a file INDEX
 void index_function(const char * argv[]) {
     
-    vector<string> filenames;
+//    vector<string> filenames;
     unordered_map <string, list<Node> > map;
     
-    for (; *argv; ++argv) {
-        filenames.push_back(string(*argv));
-    }
+//    for (; *argv; ++argv) {
+//        filenames.push_back(string(*argv));
+//    }
     
-    for (vector<string>::iterator it = filenames.begin(); it != filenames.end(); ++it) {
+    for (; *argv; ++argv) {
         string word;
         ifstream file;
         
-        file.open(*it, ios::in);
+        file.open(*argv, ios::in);
         if (!file){
-            cerr << "There was an error opening the file " << *it << endl;
+            cerr << "There was an error opening the file " << *argv << endl;
             exit(1);
         }
         
-        Node node(*(it));
+        Node node(*argv);
         
         while (file >> word) {
             // TODO: split word on non alphabetical chars
