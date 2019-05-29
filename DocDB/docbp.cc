@@ -1,5 +1,5 @@
 //
-//  docbd.cc1
+//  docbd.cc
 //  DocDB
 //
 //  Created by Susanna Ardigo'
@@ -9,9 +9,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <map>
 #include <string>
-#include <cstdlib>
+#include <map>
+#include <unordered_map>
+#include <vector>
 
 using namespace std;
 
@@ -19,23 +20,24 @@ using namespace std;
 
 
 
-class Entry {
-public:
-    string * keyword;
-    const char * filename;
-    unsigned int frequency;
-    
-    Entry(string * keyword, const char * filename, unsigned int frequency) {
-        keyword = keyword;
-        filename = filename;
-        frequency = frequency;
-    };
-    
-    ~Entry();
-    
-private:
-    
-};
+//class Node {
+//
+//private:
+//public:
+//    string keyword;
+//    string filename;
+//    unsigned int frequency;
+//
+//    Node(string word, string name)
+//    : keyword(word)
+//    , filename(name)
+//    , frequency(1)
+//    {}
+//
+//    ~Node() {};
+//
+//
+//};
 
 
 
@@ -49,13 +51,21 @@ string lowercase(string s) {
     return s;
 }
 
-/* changes a string to lowercase */
+/* checks if it contains only chars a-z && A-Z */
 bool is_alpha(string s) {
     for(std::string::iterator it = s.begin(); it != s.end(); ++it) {
         if (!((*it >= 97 && *it <= 122) || (*it >= 65 && *it <= 90)))
             return false;
     }
     return true;
+}
+
+/* checks if it contains only chars a-z && A-Z */
+bool is_valid_word(string s) {
+    if (s.length()<3 || s.length()>30)
+        return false;
+    
+    return is_alpha(s);
 }
 
 // Checks if two char * are equal
@@ -78,26 +88,105 @@ int check_arg(const char * arg, const char * word) {
 // Creates a reverse index of the words in the given files and saves it in a file INDEX
 void index_function(int argc, const char * argv[]) {
     
+    //    map <string, vector<Node>> map;
+    map <string, vector<pair<string, unsigned int>>> map;
+    
     
     for (int a=2; a<argc; ++a) {
-        const char * filename = argv[a];
         
-        string s;
+        string word;
         ifstream file;
-        file.open(filename, ios::in);
+        file.open(argv[a], ios::in);
         // file.open(argv[a], ios::in);
         if (!file){
-            cerr << "There was an error opening the file " << filename << endl;
+            cerr << "There was an error opening the file " << argv[a] << endl;
             exit(1);
         }
-        while(file >> s) {
+        while(file >> word) {
+            if (!is_valid_word(word))
+                continue;
             
-            if (is_alpha(s)) {
-                s = lowercase(s);
-                cout << s << endl;
+            word = lowercase(word);
+            
+            if (map.count(word) == 0) {
+                //                string key(word);
+                //                Node entry(word, argv[a], 1);
+                //                Node entry(word, argv[a]);
+                
+                pair<string, unsigned int> entry = make_pair(string(argv[a]), 1);
+                //                cout << entry.frequency << endl;
+                vector<pair<string, unsigned int>> nodes = {entry};
+                map.insert(pair<string, vector<pair<string, unsigned int>>>(word, nodes));
+                //                map.insert({key, nodes});
                 
             }
+            else {
+                auto node = map.find(word);
+                vector<pair<string, unsigned int>> nodes = node->second;
+                bool found = false;
+                //                for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
+                ////                    cout << it->keyword <<it->filename << endl;
+                //                    if (it->filename == argv[a]) {
+                //                        cout << "before: " << it->frequency << endl;
+                //
+                //                        ++(*it).frequency;
+                //
+                //
+                //                        found = true;
+                //                        cout << "after: " << it->frequency << endl;
+                //                    }
+                //                }
+                for (int i=0; i<nodes.size(); ++i) {
+                    //                    cout << it->keyword <<it->filename << endl;
+                    if (nodes[i].first == argv[a]) {
+                        cout << "word: " << word << endl;
+                        cout << "before: " << nodes[i].second << endl;
+//                        unsigned int * counter = &nodes[i].frequency;
+//                        ++(*counter);
+//                        nodes[i].frequency = *counter;
+                        found = true;
+                        ++nodes[i].second;
+                        cout << "after: " << nodes[i].second << endl;
+                    }
+                    
+                    //                    if (nodes[i].filename == argv[a]) {
+                    //                        cout << "before: " << nodes[i].frequency << endl;
+                    ////                        unsigned int * counter = &nodes[i].frequency;
+                    ////                        ++(*counter);
+                    ////                        nodes[i].frequency = *counter;
+                    //                        found = true;
+                    //                        cout << "after: " << nodes[i].frequency << endl;
+                    //                    }
+                }
+                
+                if (!found) {
+                    pair<string, unsigned int> entry = make_pair(string(argv[a]), 1);
+                    
+//                    Node entry(word, argv[a]);
+                    
+                    nodes.push_back(entry);
+                }
+                
+                //                for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+                //                    cout << it->filename << endl;
+                //
+                ////                    if (it->filename == filename) {
+                ////////                        cout << "before: " << it->frequency << endl;
+                ////////                        int counter = it->frequency;
+                ////////                        ++counter;
+                ////////                        found = true;
+                ////////                        cout << "after: " << it->frequency << endl;
+                ////                    }
+                ////
+                ////                    cout << it->filename << endl;
+                ////
+                //                }
+                //                vector<Node>::iterator it = find_if(nodes.begin(), nodes.end(), <#_Predicate __pred#>)
+                
+            }
+            
         }
+        
         file.close();
     }
     
