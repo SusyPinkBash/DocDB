@@ -32,6 +32,12 @@ public:
     , frequency(1)
     {}
     
+    
+    Node(string name, unsigned int frequency)
+    : filename(name)
+    , frequency(frequency)
+    {}
+    
     ~Node() {};
     
     bool operator == (const Node &n) const {
@@ -145,7 +151,7 @@ void index_function(const char * argv[]) {
     
     for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
        
-        index << it->first;
+        index << it->first << " " << it->second.size();
         for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
             index << " " << i->filename << " " << i->frequency;
         index << endl;
@@ -154,6 +160,37 @@ void index_function(const char * argv[]) {
     index.close();
     
 }
+
+
+void search_function(const char *argv[]){
+    unordered_map <string, list<Node>> map;
+    ifstream index("INDEX");
+    string word, file_name;
+    unsigned int frequency;
+    size_t len;
+    
+    while (index >> word >> len) {
+        pair<unordered_map<string, list<Node>>::iterator, bool> insertion;
+        insertion = map.insert(pair<string, list<Node>>(word, list<Node>()));
+        for (size_t i = 0; i < len; ++i) {
+            index >> file_name >> frequency;
+            insertion.first->second.push_back(Node(file_name, frequency));
+        }
+//        while (index >> file_name >> frequency)
+//            insertion.first->second.push_back(Node(file_name, frequency));
+        
+    }
+    
+    index.close();
+    
+    
+    for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
+        cout << it->first << "\n";
+        for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
+            cout << "\t" << i->filename << " frequency " << i->frequency << "\n";
+    }
+}
+
 
 
 // ########## MAIN ##########
