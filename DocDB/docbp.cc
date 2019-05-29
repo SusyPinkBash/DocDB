@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <list>
 
 using namespace std;
 
@@ -55,17 +56,16 @@ namespace std {
 
 // ########## HELPER FUNCTIONS ##########
 /* sets a string to lowercase */
-string lowercase(string s) {
+void lowercase(string& s) {
     for(std::string::iterator it = s.begin(); it != s.end(); ++it) {
         if (*it >= 65 && *it <= 90)
             *it += 32;
     }
-    return s;
 }
 
 /* checks if it contains only chars a-z && A-Z */
-bool is_alpha(string s) {
-    for(std::string::iterator it = s.begin(); it != s.end(); ++it) {
+bool is_alpha(const string& s) {
+    for(std::string::const_iterator it = s.cbegin(); it != s.cend(); ++it) {
         if (!((*it >= 97 && *it <= 122) || (*it >= 65 && *it <= 90)))
             return false;
     }
@@ -73,7 +73,7 @@ bool is_alpha(string s) {
 }
 
 /* checks if it contains only chars a-z && A-Z */
-bool is_valid_word(string s) {
+bool is_valid_word(string& s) {
     if (s.length()<3 || s.length()>30)
         return false;
     
@@ -98,21 +98,19 @@ int check_arg(const char * arg, const char * word) {
 
 // ########## INDEXING FUNCTION ##########
 // Creates a reverse index of the words in the given files and saves it in a file INDEX
-void index_function(int argc, const char * argv[]) {
+void index_function(const char * argv[]) {
     
-    vector<string> filenames = {};
-    unordered_map <string, unordered_set<Node>> map;
+    vector<string> filenames;
+    unordered_map <string, list<Node>> map;
     
-    for (int a=2; a<argc; ++a) {
-        string filename(argv[a]);
-        filenames.push_back(filename);
+    for (; *argv; ++argv) {
+        filenames.push_back(string(*argv));
     }
     
-    for (auto it = filenames.begin(); it != filenames.end(); ++it) {
+    for (vector<string>::iterator it = filenames.begin(); it != filenames.end(); ++it) {
         string word;
         ifstream file;
         
-        cout << *it << endl;
         file.open(*it, ios::in);
         if (!file){
             cerr << "There was an error opening the file " << *it << endl;
@@ -124,19 +122,35 @@ void index_function(int argc, const char * argv[]) {
             if (!is_valid_word(word))
                 continue;
             
-            word = lowercase(word);
+            lowercase(word);
             
             Node node(it);
             
-            auto insertion = map[word].insert(node);
-            if (insertion.second == false) {
-                insertion.first->frequency ++;
+            pair<unordered_map<string, list<Node>>::iterator, bool> insertion;
+            insertion = map.insert(pair<string, list<Node>>(word, list<Node>()));
+            
+//            auto insertion = map[word].insert(node);
+            if (insertion.second == false && insertion.first->second.back().file == node.file) {
+                ++insertion.first->second.back().frequency;
+            } else {
+                insertion.first->second.push_back(node);
             }
         }
-        
+    
         
         file.close();
     }
+    
+    ofstream index("INDEX");
+    
+    for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
+        cout << (*it).first << endl;
+    }
+    
+
+    index.close();
+    
+    
  
     
 }
@@ -151,7 +165,7 @@ int main(int argc, const char * argv[]) {
     
     if (check_arg(argv[1],"index")) {
         // TODO: INDEX FUNCTION
-        index_function(argc, argv);
+        index_function(argv + 2);
         
     }
     else if (check_arg(argv[1],"search")) {
