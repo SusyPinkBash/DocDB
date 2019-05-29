@@ -10,8 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using namespace std;
@@ -22,28 +22,34 @@ using namespace std;
 
 class Node {
     
-//private:
-    
 public:
-    string keyword;
-    string filename;
-    unsigned int frequency;
+    vector<string>::iterator file;
+    mutable unsigned int frequency;
     
-    Node(string word, string name)
-    : keyword(word)
-    , filename(name)
+    Node(vector<string>::iterator it)
+    : file(it)
     , frequency(1)
     {}
     
     ~Node() {};
     
-private:
-    // ##### GETTERS FUNCTIONS #####
-    string getFilename(Node node){
-        return node.filename;
+    bool operator == (const Node &n) const {
+        return n.file == file;
     }
-    
 };
+
+namespace std {
+    
+    template <>
+    struct hash<Node>
+    {
+        std::size_t operator()(const Node& k) const
+        {
+           return hash<string> () (*(k.file));
+        }
+    };
+    
+}
 
 
 
@@ -88,89 +94,50 @@ int check_arg(const char * arg, const char * word) {
     return 1;
 }
 
-void increment_frequency (Node node) {
-    ++node.frequency;
-}
-
 
 
 // ########## INDEXING FUNCTION ##########
 // Creates a reverse index of the words in the given files and saves it in a file INDEX
 void index_function(int argc, const char * argv[]) {
     
-    map <string, vector<Node*>> map;
-    //    unordered_map<string, vector<Node>> map;
-    
+    vector<string> filenames = {};
+    unordered_map <string, unordered_set<Node>> map;
     
     for (int a=2; a<argc; ++a) {
-        //        const char * filename = argv[a];
-        
+        string filename(argv[a]);
+        filenames.push_back(filename);
+    }
+    
+    for (auto it = filenames.begin(); it != filenames.end(); ++it) {
         string word;
         ifstream file;
-        file.open(argv[a], ios::in);
-        // file.open(argv[a], ios::in);
+        
+        cout << *it << endl;
+        file.open(*it, ios::in);
         if (!file){
-            cerr << "There was an error opening the file " << argv[a] << endl;
+            cerr << "There was an error opening the file " << *it << endl;
             exit(1);
         }
-        while(file >> word) {
+        
+        while (file >> word) {
+            // TODO: split word on non alphabetical chars
             if (!is_valid_word(word))
                 continue;
             
             word = lowercase(word);
             
-            if (map.count(word) == 0) {
-                Node entry(word, argv[a]);
-                vector<Node*> nodes = {&entry};
-                map.insert(pair<string, vector<Node*>>(word, nodes));
-                
-            }
-            else {
-                auto node = map.find(word);
-                vector<Node*> nodes = node->second;
-                bool found = false;
-               
-                for (int i=0; i<nodes.size(); ++i) {
-                    cout << i << endl;
-                    cout << &nodes << endl;
-                    cout << &nodes[0] << endl;
-                    cout << &nodes[0]->filename << endl;
-                    
-                    
-                    
-                    
-                    if (nodes[i]->filename == argv[a]) {
-//                        cout << "before: " << nodes[i]->frequency << endl;
-                        ++nodes[i]->frequency;
-                        found = true;
-//                        cout << "after: " << nodes[i]->frequency << endl;
-                        break;
-                        
-                    }
-                }
-                
-                if (!found) {
-                    
-                    Node entry(word, argv[a]);
-                    nodes.push_back(&entry);
-                }
-            }
+            Node node(it);
             
+            auto insertion = map[word].insert(node);
+            if (insertion.second == false) {
+                insertion.first->frequency ++;
+            }
         }
         
-        cout << map.size() << endl;
+        
         file.close();
     }
-    
-    
-    
-    //    INDEX << "Some random test" << endl;
-    //    INDEX.close();
-    
-    
-//        map.~map();
-//    cout << "delete map" << endl;
-    
+ 
     
 }
 
