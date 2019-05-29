@@ -21,20 +21,20 @@ using namespace std;
 
 
 class Node {
-
+    
 private:
-
+    
 public:
     string keyword;
     string filename;
     unsigned int frequency;
- 
+    
     Node(string word, string name)
     : keyword(word)
     , filename(name)
     , frequency(1)
     {}
-
+    
     ~Node() {};
     
 };
@@ -82,13 +82,17 @@ int check_arg(const char * arg, const char * word) {
     return 1;
 }
 
+void increment_frequency (Node node) {
+    ++node.frequency;
+}
+
 
 
 // ########## INDEXING FUNCTION ##########
 // Creates a reverse index of the words in the given files and saves it in a file INDEX
 void index_function(int argc, const char * argv[]) {
     
-    map <string, vector<Node>> map;
+    map <string, vector<Node*>> map;
     //    unordered_map<string, vector<Node>> map;
     
     
@@ -110,64 +114,31 @@ void index_function(int argc, const char * argv[]) {
             word = lowercase(word);
             
             if (map.count(word) == 0) {
-                //                string key(word);
-                //                Node entry(word, argv[a], 1);
                 Node entry(word, argv[a]);
-//                cout << entry.frequency << endl;
-                vector<Node> nodes = {entry};
-                map.insert(pair<string, vector<Node>>(word, nodes));
-                //                map.insert({key, nodes});
+                vector<Node*> nodes = {&entry};
+                map.insert(pair<string, vector<Node*>>(word, nodes));
                 
             }
             else {
                 auto node = map.find(word);
-                vector<Node> nodes = node->second;
+                vector<Node*> nodes = node->second;
                 bool found = false;
-//                for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-////                    cout << it->keyword <<it->filename << endl;
-//                    if (it->filename == argv[a]) {
-//                        cout << "before: " << it->frequency << endl;
-//
-//                        ++(*it).frequency;
-//
-//
-//                        found = true;
-//                        cout << "after: " << it->frequency << endl;
-//                    }
-//                }
+               
                 for (int i=0; i<nodes.size(); ++i) {
-                    //                    cout << it->keyword <<it->filename << endl;
-                    if (nodes[i].filename == argv[a]) {
-                        cout << "before: " << nodes[i].frequency << endl;
-//                        unsigned int * counter = &nodes[i].frequency;
-//                        ++(*counter);
-//                        nodes[i].frequency = *counter;
+                    
+                    if (nodes[i]->filename == argv[a]) {
+//                        cout << "before: " << nodes[i]->frequency << endl;
+                        ++nodes[i]->frequency;
                         found = true;
-                        cout << "after: " << nodes[i].frequency << endl;
+                        break;
+//                        cout << "after: " << nodes[i]->frequency << endl;
                     }
                 }
                 
                 if (!found) {
                     Node entry(word, argv[a]);
-                    nodes.push_back(entry);
+                    nodes.push_back(&entry);
                 }
-                
-                //                for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-                //                    cout << it->filename << endl;
-                //
-                ////                    if (it->filename == filename) {
-                ////////                        cout << "before: " << it->frequency << endl;
-                ////////                        int counter = it->frequency;
-                ////////                        ++counter;
-                ////////                        found = true;
-                ////////                        cout << "after: " << it->frequency << endl;
-                ////                    }
-                ////
-                ////                    cout << it->filename << endl;
-                ////
-                //                }
-                //                vector<Node>::iterator it = find_if(nodes.begin(), nodes.end(), <#_Predicate __pred#>)
-                
             }
             
         }
@@ -179,7 +150,7 @@ void index_function(int argc, const char * argv[]) {
     
     //    INDEX << "Some random test" << endl;
     //    INDEX.close();
-    //    map.~multimap();
+        map.~map();
     
 }
 
