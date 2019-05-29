@@ -200,7 +200,15 @@ void search_function(const char *argv[]){
         if (entry != map.end())
             for (list<Node>::const_iterator it = entry->second.cbegin(); it != entry->second.cend(); ++it)
                 other.push_back(it->filename);
-        set_intersection(out.begin(), out.end(), other.begin(), other.end(), out.begin());
+//        set_intersection(out.begin(), out.end(), other.begin(), other.end(), out.begin());
+        
+//        list<string>::iterator first1 = out.begin(), first2 = other.begin();
+        
+        for (list<string>::iterator first1 = out.begin(); first1 != out.end();)
+            if (find(other.cbegin(), other.cend(), *first1) == other.cend())
+                first1 = out.erase(first1);
+            else
+                ++first1;
         
     }
     
