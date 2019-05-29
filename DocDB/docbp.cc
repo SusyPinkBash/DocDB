@@ -130,19 +130,21 @@ void index_function(int argc, const char * argv[]) {
 //                        cout << "before: " << nodes[i]->frequency << endl;
                         ++nodes[i]->frequency;
                         found = true;
-                        break;
 //                        cout << "after: " << nodes[i]->frequency << endl;
+                        break;
+                        
                     }
                 }
                 
                 if (!found) {
+                    
                     Node entry(word, argv[a]);
                     nodes.push_back(&entry);
                 }
             }
             
         }
-        
+//        cout << map.size() << endl;
         file.close();
     }
     
@@ -150,7 +152,9 @@ void index_function(int argc, const char * argv[]) {
     
     //    INDEX << "Some random test" << endl;
     //    INDEX.close();
-        map.~map();
+    
+//        map.~map();
+//    cout << "delete map" << endl;
     
 }
 
