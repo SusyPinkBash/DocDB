@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -107,7 +108,7 @@ int check_arg(const char * arg, const char * word) {
 void index_function(const char * argv[]) {
     
     vector<string> filenames;
-    unordered_map <string, list<Node>> map;
+    unordered_map <string, list<Node> > map;
     
     for (; *argv; ++argv) {
         filenames.push_back(string(*argv));
@@ -133,8 +134,8 @@ void index_function(const char * argv[]) {
             lowercase(word);
             
             
-            pair<unordered_map<string, list<Node>>::iterator, bool> insertion;
-            insertion = map.insert(pair<string, list<Node>>(word, list<Node>()));
+            pair<unordered_map<string, list<Node> >::iterator, bool> insertion;
+            insertion = map.insert(pair<string, list<Node> >(word, list<Node>()));
             
             if (insertion.second == false && insertion.first->second.back().filename == node.filename) {
                 ++insertion.first->second.back().frequency;
@@ -149,7 +150,7 @@ void index_function(const char * argv[]) {
     
     ofstream index("INDEX");
     
-    for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
+    for (unordered_map<string, list<Node> >::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
        
         index << it->first << " " << it->second.size();
         for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
@@ -163,15 +164,15 @@ void index_function(const char * argv[]) {
 
 
 void search_function(const char *argv[]){
-    unordered_map <string, list<Node>> map;
+    unordered_map <string, list<Node> > map;
     ifstream index("INDEX");
     string word, file_name;
     unsigned int frequency;
     size_t len;
     
     while (index >> word >> len) {
-        pair<unordered_map<string, list<Node>>::iterator, bool> insertion;
-        insertion = map.insert(pair<string, list<Node>>(word, list<Node>()));
+        pair<unordered_map<string, list<Node> >::iterator, bool> insertion;
+        insertion = map.insert(pair<string, list<Node> >(word, list<Node>()));
         for (size_t i = 0; i < len; ++i) {
             index >> file_name >> frequency;
             insertion.first->second.push_back(Node(file_name, frequency));
@@ -182,13 +183,36 @@ void search_function(const char *argv[]){
     }
     
     index.close();
-    
-    
-    for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
-        cout << it->first << "\n";
-        for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
-            cout << "\t" << i->filename << " frequency " << i->frequency << "\n";
+    list<string> out;
+    string s(*argv++);
+    unordered_map<string, list<Node> >::iterator entry = map.find(s);
+    if (entry != map.end())
+        for (list<Node>::const_iterator it = entry->second.cbegin(); it != entry->second.cend(); ++it)
+            out.push_back(it->filename);
+    while (*argv) {
+        s = string(*argv++);
+        if (!is_valid_word(s))
+            continue;
+        lowercase(s);
+        
+        list<string> other;
+        entry = map.find(s);
+        if (entry != map.end())
+            for (list<Node>::const_iterator it = entry->second.cbegin(); it != entry->second.cend(); ++it)
+                other.push_back(it->filename);
+        set_intersection(out.begin(), out.end(), other.begin(), other.end(), out.begin());
+        
     }
+    
+    
+    for (list<string>::const_iterator it = out.cbegin(); it != out.cend(); ++it)
+        cout << *it << endl;
+    
+//    for (unordered_map<string, list<Node> >::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
+//        cout << it->first << "\n";
+//        for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
+//            cout << "\t" << i->filename << " frequency " << i->frequency << "\n";
+//    }
 }
 
 
@@ -207,6 +231,8 @@ int main(int argc, const char * argv[]) {
     }
     else if (check_arg(argv[1],"search")) {
         // TODO: SEARCH FUNCTION
+        
+        search_function(argv + 2);
         
     }
     
