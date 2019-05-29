@@ -46,20 +46,6 @@ public:
     }
 };
 
-//namespace std {
-
-//    template <>
-//    struct hash<Node>
-//    {
-//        std::size_t operator()(const Node& k) const
-//        {
-//           return hash<string> () (*(k.filename));
-//        }
-//    };
-
-//}
-
-
 
 // ########## HELPER FUNCTIONS ##########
 /* sets a string to lowercase */
@@ -100,7 +86,6 @@ int check_arg(const char * arg, const char * word) {
     
     return 1;
 }
-
 
 
 // ########## INDEXING FUNCTION ##########
@@ -159,7 +144,6 @@ void index_function(const char * argv[]) {
     }
     
     index.close();
-    
 }
 
 
@@ -177,8 +161,6 @@ void search_function(const char *argv[]){
             index >> file_name >> frequency;
             insertion.first->second.push_back(Node(file_name, frequency));
         }
-//        while (index >> file_name >> frequency)
-//            insertion.first->second.push_back(Node(file_name, frequency));
         
     }
     
@@ -215,12 +197,7 @@ void search_function(const char *argv[]){
     
     for (list<string>::const_iterator it = out.cbegin(); it != out.cend(); ++it)
         cout << *it << endl;
-    
-//    for (unordered_map<string, list<Node> >::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
-//        cout << it->first << "\n";
-//        for (list<Node>::const_iterator i = it->second.cbegin(); i != it->second.cend(); ++i)
-//            cout << "\t" << i->filename << " frequency " << i->frequency << "\n";
-//    }
+
 }
 
 
@@ -243,7 +220,6 @@ int main(int argc, const char * argv[]) {
         search_function(argv + 2);
         
     }
-    
     
     return 0;
 }
