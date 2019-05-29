@@ -20,24 +20,24 @@ using namespace std;
 
 
 
-//class Node {
-//
-//private:
-//public:
-//    string keyword;
-//    string filename;
-//    unsigned int frequency;
-//
-//    Node(string word, string name)
-//    : keyword(word)
-//    , filename(name)
-//    , frequency(1)
-//    {}
-//
-//    ~Node() {};
-//
-//
-//};
+class Node {
+
+private:
+
+public:
+    string keyword;
+    string filename;
+    unsigned int frequency;
+ 
+    Node(string word, string name)
+    : keyword(word)
+    , filename(name)
+    , frequency(1)
+    {}
+
+    ~Node() {};
+    
+};
 
 
 
@@ -88,11 +88,12 @@ int check_arg(const char * arg, const char * word) {
 // Creates a reverse index of the words in the given files and saves it in a file INDEX
 void index_function(int argc, const char * argv[]) {
     
-    //    map <string, vector<Node>> map;
-    map <string, vector<pair<string, unsigned int>>> map;
+    map <string, vector<Node>> map;
+    //    unordered_map<string, vector<Node>> map;
     
     
     for (int a=2; a<argc; ++a) {
+        //        const char * filename = argv[a];
         
         string word;
         ifstream file;
@@ -111,59 +112,43 @@ void index_function(int argc, const char * argv[]) {
             if (map.count(word) == 0) {
                 //                string key(word);
                 //                Node entry(word, argv[a], 1);
-                //                Node entry(word, argv[a]);
-                
-                pair<string, unsigned int> entry = make_pair(string(argv[a]), 1);
-                //                cout << entry.frequency << endl;
-                vector<pair<string, unsigned int>> nodes = {entry};
-                map.insert(pair<string, vector<pair<string, unsigned int>>>(word, nodes));
+                Node entry(word, argv[a]);
+//                cout << entry.frequency << endl;
+                vector<Node> nodes = {entry};
+                map.insert(pair<string, vector<Node>>(word, nodes));
                 //                map.insert({key, nodes});
                 
             }
             else {
                 auto node = map.find(word);
-                vector<pair<string, unsigned int>> nodes = node->second;
+                vector<Node> nodes = node->second;
                 bool found = false;
-                //                for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-                ////                    cout << it->keyword <<it->filename << endl;
-                //                    if (it->filename == argv[a]) {
-                //                        cout << "before: " << it->frequency << endl;
-                //
-                //                        ++(*it).frequency;
-                //
-                //
-                //                        found = true;
-                //                        cout << "after: " << it->frequency << endl;
-                //                    }
-                //                }
+//                for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
+////                    cout << it->keyword <<it->filename << endl;
+//                    if (it->filename == argv[a]) {
+//                        cout << "before: " << it->frequency << endl;
+//
+//                        ++(*it).frequency;
+//
+//
+//                        found = true;
+//                        cout << "after: " << it->frequency << endl;
+//                    }
+//                }
                 for (int i=0; i<nodes.size(); ++i) {
                     //                    cout << it->keyword <<it->filename << endl;
-                    if (nodes[i].first == argv[a]) {
-                        cout << "word: " << word << endl;
-                        cout << "before: " << nodes[i].second << endl;
+                    if (nodes[i].filename == argv[a]) {
+                        cout << "before: " << nodes[i].frequency << endl;
 //                        unsigned int * counter = &nodes[i].frequency;
 //                        ++(*counter);
 //                        nodes[i].frequency = *counter;
                         found = true;
-                        ++nodes[i].second;
-                        cout << "after: " << nodes[i].second << endl;
+                        cout << "after: " << nodes[i].frequency << endl;
                     }
-                    
-                    //                    if (nodes[i].filename == argv[a]) {
-                    //                        cout << "before: " << nodes[i].frequency << endl;
-                    ////                        unsigned int * counter = &nodes[i].frequency;
-                    ////                        ++(*counter);
-                    ////                        nodes[i].frequency = *counter;
-                    //                        found = true;
-                    //                        cout << "after: " << nodes[i].frequency << endl;
-                    //                    }
                 }
                 
                 if (!found) {
-                    pair<string, unsigned int> entry = make_pair(string(argv[a]), 1);
-                    
-//                    Node entry(word, argv[a]);
-                    
+                    Node entry(word, argv[a]);
                     nodes.push_back(entry);
                 }
                 
