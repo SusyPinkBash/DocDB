@@ -24,33 +24,33 @@ using namespace std;
 class Node {
     
 public:
-    vector<string>::iterator file;
+    string filename;
     mutable unsigned int frequency;
     
-    Node(vector<string>::iterator it)
-    : file(it)
+    Node(string name)
+    : filename(name)
     , frequency(1)
     {}
     
     ~Node() {};
     
     bool operator == (const Node &n) const {
-        return n.file == file;
+        return n.filename == filename;
     }
 };
 
-namespace std {
-    
-    template <>
-    struct hash<Node>
-    {
-        std::size_t operator()(const Node& k) const
-        {
-           return hash<string> () (*(k.file));
-        }
-    };
-    
-}
+//namespace std {
+
+//    template <>
+//    struct hash<Node>
+//    {
+//        std::size_t operator()(const Node& k) const
+//        {
+//           return hash<string> () (*(k.filename));
+//        }
+//    };
+
+//}
 
 
 
@@ -117,6 +117,8 @@ void index_function(const char * argv[]) {
             exit(1);
         }
         
+        Node node(*(it));
+        
         while (file >> word) {
             // TODO: split word on non alphabetical chars
             if (!is_valid_word(word))
@@ -124,19 +126,18 @@ void index_function(const char * argv[]) {
             
             lowercase(word);
             
-            Node node(it);
             
             pair<unordered_map<string, list<Node>>::iterator, bool> insertion;
             insertion = map.insert(pair<string, list<Node>>(word, list<Node>()));
             
-//            auto insertion = map[word].insert(node);
-            if (insertion.second == false && insertion.first->second.back().file == node.file) {
+            //            auto insertion = map[word].insert(node);
+            if (insertion.second == false && insertion.first->second.back().filename == node.filename) {
                 ++insertion.first->second.back().frequency;
             } else {
                 insertion.first->second.push_back(node);
             }
         }
-    
+        
         
         file.close();
     }
@@ -146,12 +147,11 @@ void index_function(const char * argv[]) {
     for (unordered_map<string, list<Node>>::const_iterator it = map.cbegin(); it != map.cend(); ++it) {
         cout << (*it).first << endl;
     }
-    
-
+    
     index.close();
     
     
- 
+    
     
 }
 
