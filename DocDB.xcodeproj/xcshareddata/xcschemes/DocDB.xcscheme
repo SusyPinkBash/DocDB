@@ -68,11 +68,23 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
+            argument = "index empty"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "search aaaa"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "search &apos;    &apos;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "search ciao ipsum"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "index other"
+            argument = "index other other2"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
