@@ -68,7 +68,7 @@ bool is_alpha(const string& s) {
     return true;
 }
 
-/* checks if it contains only chars a-z && A-Z */
+/* checks if its lengths is in between 3 and 30 and if contains only chars a-z && A-Z */
 bool is_valid_word(string& s) {
     if (s.length()<3 || s.length()>30)
         return false;
@@ -76,8 +76,14 @@ bool is_valid_word(string& s) {
     return is_alpha(s);
 }
 
-// ########## INDEXING FUNCTION ##########
-// Creates a reverse index of the words in the given files and saves it in a file INDEX
+
+
+
+// ########## REQUESTED FUNCTIONS ##########
+/* Reads the given files and creates an index in a file called INDEX. The index is a reverse index of words,
+ meaning that the index maps each word to a list of files. A word is a maximal contigu- ous sequence of
+ alphabetical characters adjacent to any non-alphabetical characters (or to the beginning or end of file).
+ Only words that are between 3 and 30 characters in length are considered in the indexing and search */
 void index_function(int argc, const char * argv[]) {
     
     unordered_map <string, list<Node> > map;
@@ -99,6 +105,7 @@ void index_function(int argc, const char * argv[]) {
         Node node(file_id++);
         
         while (file >> word) {
+            // replace non alpha chars
             replace(word.begin(), word.end(), '-', ' ');
             stringstream ss(word);
             string s;
@@ -130,6 +137,8 @@ void index_function(int argc, const char * argv[]) {
 }
 
 
+
+/* Reads the INDEX file, creates a vector of filenames and an unordered_map of all the keywords */
 void read_index(unordered_map <string, list<Node> >& map, vector<string>& file_names)
 {
     ifstream index("INDEX");
@@ -155,17 +164,16 @@ void read_index(unordered_map <string, list<Node> >& map, vector<string>& file_n
 }
 
 
+
+/* Given an unordered_map and char * of keywords returns a list of files that have all the keywords and the frequency  */
 void intersection_function(unordered_map <string, list<Node> >& map, list<Node>& out, const char *argv[]){
     string s(*argv++);
     lowercase(s);
-//    cout << "intersection" << endl;
     unordered_map<string, list<Node> >::iterator entry = map.find(s);
     if (entry != map.end())
         for (list<Node>::const_iterator it = entry->second.cbegin(); it != entry->second.cend(); ++it)
             out.push_back(*it);
-//    for (list<Node>::const_iterator it = out.cbegin(); it != out.cend(); ++it)
-//        cout << it->file_id << endl;
-//    cout << endl;
+    
     while (*argv) {
         s = string(*argv++);
         if (!is_valid_word(s))
@@ -178,13 +186,10 @@ void intersection_function(unordered_map <string, list<Node> >& map, list<Node>&
                 other.push_back(*it);
         list<Node>::iterator first1 = out.begin();
         for (list<Node>::iterator first2 = other.begin(); first1 != out.end() && first2 != other.end();) {
-//            cout << "iteration" << first1->file_id << " " << first2->file_id << endl;
             if (first1->file_id > first2->file_id) {
-//                cout << "increment" << endl;
                 ++first2;
             }
             else if (first2->file_id > first1->file_id) {
-//                cout << "delete" << endl;
                 first1 = out.erase(first1);
             }
             else {
@@ -197,6 +202,13 @@ void intersection_function(unordered_map <string, list<Node> >& map, list<Node>&
     }
 }
 
+
+
+/* Reads the index from a file called INDEX and outputs, on the standard output, a list of all the
+ files (filenames) that contain all the keywords passed on the command line. The keyword match must
+ be case-insensitive. If no indexed file contains all the given keywords, the program does not output
+ anything. The names of the matching files must be printed in the original order passed to the indexing
+ function. The search function may only read the index file. */
 void search_function(const char *argv[]){
     unordered_map <string, list<Node> > map;
     vector<string> file_names;
@@ -207,6 +219,8 @@ void search_function(const char *argv[]){
         cout << file_names[it->file_id] << endl;
 }
 
+
+/* In this case, the program runs the search function as search_function, except that, instead of sorting the output files in the original indexing order, it outputs the matching files in decreasing order of total count of matching words. */
 void searchP_function(const char *argv[]){
     unordered_map <string, list<Node> > map;
     vector<string> file_names;
